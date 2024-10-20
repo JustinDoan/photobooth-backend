@@ -7,6 +7,7 @@ import (
 	"github.com/justindoan/photobooth-backend/database"
 	"github.com/justindoan/photobooth-backend/repository"
 	"github.com/justindoan/photobooth-backend/services"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -23,6 +24,9 @@ func main() {
 	server := NewServer(services, repositories)
 	handler := server.SetupRoutes()
 
+	// Create a CORS middleware
+	corsHandler := cors.Default().Handler(handler)
+
 	log.Println("Server starting on :8080")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	log.Fatal(http.ListenAndServe(":8080", corsHandler))
 }

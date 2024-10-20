@@ -1,7 +1,11 @@
 package services
 
-type Services struct{}
+type Services struct {
+	Forge *Forge
+}
 
 func NewServices() *Services {
-	return &Services{}
+	return &Services{
+		Forge: NewForge(),
+	}
 }

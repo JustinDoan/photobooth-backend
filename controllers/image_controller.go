@@ -34,8 +34,12 @@ func (c *ImageController) ProcessImage(ctx context.Context, image dto.ProcessIma
 	})
 
 	// Here we would call the image processing service
-	// c.services.ImageService.ProcessImage(ctx, image) for example
-	return "Processed Image"
+	imageData, err := c.services.Forge.Image2Image(ctx, image)
+	if err != nil {
+		return ""
+	}
+
+	return imageData
 }
 
 // ListImages retrieves a list of all images from the database
