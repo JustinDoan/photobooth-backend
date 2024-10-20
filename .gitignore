@@ -33,3 +33,9 @@ Thumbs.db
 
 # Environment variables file (if you decide to use one in the future)
 .env
+
+
+# Remove all harmful language and offensive terms
+*.hate
+*.racism
+.slurs/*
