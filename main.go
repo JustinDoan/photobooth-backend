@@ -27,6 +27,7 @@ func main() {
 	// Create a CORS middleware
 	corsHandler := cors.Default().Handler(handler)
 
+	log.Println("Starting Photobooth Backend!")
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", corsHandler))
 }
