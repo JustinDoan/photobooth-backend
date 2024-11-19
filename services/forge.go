@@ -57,14 +57,17 @@ type ImageResponse struct {
 
 func (f *Forge) Image2Image(ctx context.Context, request dto.ProcessImageRequest) (string, error) {
 
+	//fmt.Printf("Received request with denoisingStrength: %f\n", request.DenoisingStrength)
+	//fmt.Printf("Received request with CFG Scale: %f\n", request.CfgScale)
+
 	payload := ImagePayload{
 		Prompt:            request.Prompt,
 		Steps:             30,
-		CfgScale:          7,
+		CfgScale:          request.CfgScale,
 		Width:             request.Width,
 		Height:            request.Height,
 		InitImages:        []string{request.Data},
-		DenoisingStrength: 0.5,
+		DenoisingStrength: request.DenoisingStrength,
 	}
 
 	jsonPayload, err := json.Marshal(payload)
