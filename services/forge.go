@@ -3,10 +3,15 @@ package services
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/png"
 	"net/http"
-
+	"github.com/nfnt/resize"
+	_ "image/jpeg"
+	_ "image/png"
 	"github.com/justindoan/photobooth-backend/dto"
 )
 
@@ -37,29 +42,7 @@ type ImageResponse struct {
 	Images []string `json:"images"`
 }
 
-// url := "http://127.0.0.1:7860/sdapi/v1/txt2img"
-
-// 	payload := ImagePayload{
-// 		Prompt:            prompt,
-// 		Steps:             steps,
-// 		CfgScale:          1,
-// 		DistilledCfgScale: 3.5,
-// 		Width:             896,
-// 		Height:            1152,
-// 		SamplerName:       "euler",
-// 		// SamplerName: "DPM++ 2M SDE",
-// 		Scheduler: "Simple",
-// 		// Scheduler:         "Karras",
-// 		EnableHr:          false,
-// 		Seed:              -1,
-// 		DenoisingStrength: 0.5,
-// 	}
-
 func (f *Forge) Image2Image(ctx context.Context, request dto.ProcessImageRequest) (string, error) {
-
-	//fmt.Printf("Received request with denoisingStrength: %f\n", request.DenoisingStrength)
-	//fmt.Printf("Received request with CFG Scale: %f\n", request.CfgScale)
-
 	payload := ImagePayload{
 		Prompt:            request.Prompt,
 		Steps:             30,
@@ -94,5 +77,37 @@ func (f *Forge) Image2Image(ctx context.Context, request dto.ProcessImageRequest
 		return "", fmt.Errorf("no image generated")
 	}
 
-	return result.Images[0], nil
+	// Flip the image upside down
+	flippedImage, err := flipImageUpsideDown(result.Images[0])
+	if err != nil {
+		return "", fmt.Errorf("error flipping image: %v", err)
+	}
+
+	return flippedImage, nil
+}
+
+func flipImageUpsideDown(encodedImage string) (string, error) {
+	// Decode the base64 image
+	imageData, err := base64.StdEncoding.DecodeString(encodedImage)
+	if err != nil {
+		return "", fmt.Errorf("error decoding base64 image: %v", err)
+	}
+
+	// Decode the image
+	img, _, err := image.Decode(bytes.NewReader(imageData))
+	if err != nil {
+		return "", fmt.Errorf("error decoding image: %v", err)
+	}
+
+	// Flip the image upside down
+	flippedImg := imaging.FlipV(img)
+
+	// Encode the flipped image to PNG
+	buf := new(bytes.Buffer)
+	if err := png.Encode(buf, flippedImg); err != nil {
+		return "", fmt.Errorf("error encoding flipped image: %v", err)
+	}
+
+	// Return the new base64 encoded image
+	return base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
