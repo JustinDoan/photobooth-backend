@@ -1,0 +1,13 @@
+package tests
+
+import (
+	"testing"
+)
+
+func TestSample(t *testing.T) {
+	expected := 2
+	actual := 1 + 1
+	if actual != expected {
+		t.Errorf("expected %d but got %d", expected, actual)
+	}
+}
